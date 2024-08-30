@@ -42,7 +42,7 @@ def get_open_ports(target, port_range, verbose = False):
             if client_socket.connect_ex( (target, port) ) != 0:
                 print(f"4) Port {port} is closed")
                 print(f"5) Closing socket")
-                client_socket.close()
+                # client_socket.close() # MOVED TO finally: BLOCK
             else:
                 if not verbose:
                     open_ports.append(port)
@@ -51,13 +51,18 @@ def get_open_ports(target, port_range, verbose = False):
                     resp_string += f"\n{port:<9}{ports_and_services[port]}"
                     print(f"4) Port {port} is open and string is modified")
                     # service = client_socket.getservbyport(port) #ALTERNATIVE
-                client_socket.close()
+                # client_socket.close() # MOVED TO finally: BLOCK
                 print(f"5) Socket for port #{port} closed")
+
         except: # IF CONNECTION UNSUCCESSFUL, target IS INVALID
             print(f"Error: Invalid {link}")
-            client_socket.close()
+            # client_socket.close() # MOVED TO finally: BLOCK
             return f"Error: Invalid {link}"
-
+        
+        finally:
+            client_socket.close()
+    
+    # === SEND RETURNED INFO === 
     if verbose:
         print(resp_string)
         return resp_string
